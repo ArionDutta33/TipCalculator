@@ -1,93 +1,102 @@
-//selecting the things first
+//selecting the form and the various intput fields
 const form = document.querySelector("form")
-const billAmount = form.elements["billAmount"]//user
-const tipPercentage = form.elements["tipPercent"]//user
-const tipAmount = form.elements["tipAmount"]//calculate
-const totalBill = form.elements["totalBill"]//calculate
+const billAmount = form.elements["billAmount"]
+const tipPercent = form.elements["tipPercent"]
+const tipAmount = form.elements["tipAmount"]
+const totalBill = form.elements["totalBill"]
+console.log(billAmount, tipPercent, tipAmount, totalBill)
 
-//!logging the bill amount to check whether it is referring to the correct field
-// console.log(billAmount)
+//fuction to check if any of the input field is empty or not
+const isEmpty = (fieldInput) => {
+    if (fieldInput === "")
+        return 1;
+    else
+        return 0;
 
-//calculate the tip amount
-const tipAmountCal = (billInput, tipInput) => {
-    return (tipInput / 100) * billInput
-}
-const amount = () => {
-    const billAmountValue = billAmount.value
-    const tipPercentageValue = tipPercentage.value
-    const sum = tipAmountCal(billAmountValue, tipPercentageValue)
-    return sum
 }
 
-//calculate the total bill amount
-
-
-const totalAmount = () => {
-    const billAmountValue = parseInt(billAmount.value)
-    const tipAmount = amount()
-    const total = tipAmount + billAmountValue
-    return total
-}
-//check if the inputs are empty..if yes return 1 else 0 // !added later
-const isEmpty = (userInput) => {
-
-    if (userInput === "")
+//checking whether the input fields have only numbers of not
+const notNumber = (userInput) => {
+    if (typeof (userInput) === "string" || isNaN(userInput))
         return 1
     else
         return 0
-
+}
+//warn the user of invalid inputs
+const showMsg = (input, msg) => {
+    const show = input.nextElementSibling
+    show.textContent = msg
 }
 
-//check if the input is a number if yes return 1 else return 0 //*! added later
-const isNumber = (userInput) => {
-    if (typeof (userInput) === "number")
-        return 1
-    else
-        return 0
-
-}
-//check the bill amount whether it is empty or not Or whether it is a number or not //*! added later
-const checkUserInput = () => {
-    const userInput = parseInt(billAmount.value) //!check parse int
-    //!logging the user input value
-    // console.log(userInput)
-    if (isEmpty(userInput)) {
-        const msgBox = document.querySelector("#bill")
-        msgBox.textContent = "Bill amount cannot be empty"
-    } else if (!isNumber(userInput)) {
-        const msgBox = document.querySelector("#bill")
-        msgBox.textContent = "Please enter a number"
-    } else {
-        const msgBox = document.querySelector("#bill")
-        msgBox.textContent = "Valid"
-    }
-}
-
-//now check the tip percentage field//*! added later
-const checkTipPercent = () => {
-    const userInput = parseInt(tipPercentage.value)
-    if (isEmpty(userInput)) {
-        const msgBox = document.querySelector("#tip")
-        msgBox.textContent = "Tip % cannot be empty"
-    } else if (!isNumber(userInput)) {
-        const msgBox = document.querySelector("#tip")
-        msgBox.textContent = "Please enter a number"
+//now checking the field of bill amount
+const checkBill = () => {
+    let valid = false
+    const billValue = parseInt(billAmount.value)//parse int added
+    if (isEmpty(billValue)) {
+        showMsg(billAmount, "The bill amount cannot be empty")
+        return valid
+    } else if (notNumber(billValue)) {
+        showMsg(billAmount, "Enter a number")
+        return valid
     }
     else {
-        const msgBox = document.querySelector("#tip")
-        msgBox.textContent = "Valid"
+        showMsg(billAmount, "valid")
+        valid = true
+        return valid
     }
+
 }
-//add the event listenerundefined
+
+//now checking the field of the tip amount
+const checkTip = () => {
+    let valid = false
+    const tipValue = parseInt(tipPercent.value)//parse int added
+    if (isEmpty(tipValue)) {
+        showMsg(tipPercent, "Kindly enter the tip %")
+        return valid
+    }
+    else if (notNumber(tipValue)) {
+        showMsg(tipPercent, "Kindly enter the %")
+        return valid
+    }
+    else {
+        showMsg(tipPercent, "valid")
+        valid = true
+        return valid
+    }
+
+}
+//making the logic where the user can enter the bill amount and tip percentage then get the tip amount and the total bill
 
 
 
+const totalTip = () => {
+    const billUserValue = parseInt(billAmount.value)//parse int added
+    const tipPercentUserValue = parseInt(tipPercent.value)//parse int added
+
+    return (tipPercentUserValue / 100) * billUserValue
+}
+const sumAmount = () => {
+    const userBill = parseInt(billAmount.value)//parse int added
+
+    const calTip = totalTip();
+    return calTip + userBill;
+}
+
+//adding the event listener
 form.addEventListener("submit", (e) => {
     e.preventDefault()
-    checkUserInput()
-    checkTipPercent()
-    tipAmount.value = amount()
-    totalBill.value = totalAmount()
+
+    let isBillValid = checkBill()
+    let isTipValid = checkTip()
+
+    let isFormValid = isBillValid && isTipValid
+
+    if (isFormValid) {
+
+        tipAmount.value = totalTip()
+
+        totalBill.value = sumAmount()
+
+    }
 })
-//to be continued
-//working
